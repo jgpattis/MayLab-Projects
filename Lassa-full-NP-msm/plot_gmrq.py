@@ -43,7 +43,7 @@ for j in range(len(components)):
 axs[best[0][0]][best[1][0]].scatter(lags2[best[2][0]], m1[best], c='g', s=100, marker='*')       
  
 for n in range(len(components)):
-    axs[n][0].set_ylabel('GMRQ-6', fontsize=12)
+    axs[n][0].set_ylabel('GMRQ-4', fontsize=12)
             
 for l in range(len(components)):
     axs[l][len(clusters)-1].yaxis.set_label_position('right')
