@@ -16,9 +16,11 @@ lags = [ 5, 15, 30, 45, 60, 75]
 cl = [ 25, 50, 75, 100, 125, 150, 200, 300]
 
 model = Pipeline([
-	('tica', tICA(kinetic_mapping=True)), 
-	('cluster', MiniBatchKMeans()), 
-	('msm', MarkovStateModel(lag_time=16, n_timescales=3, prior_counts=0.01, verbose=False))
+    ('tica', tICA(kinetic_mapping=True)), 
+    ('cluster', MiniBatchKMeans()), 
+    ('msm', MarkovStateModel(lag_time=16, n_timescales=3, verbose=False))
+    #### use if percent retained is lower than 80 percent
+    ##('msm', MarkovStateModel(lag_time=16, n_timescales=3, ergodic_cuttoff=off, prior_conts=0.00001, verbose=False))
 ])
 
 shuffle_split = ShuffleSplit(len(ftrajs_list), n_iter=15, test_size=0.5)
