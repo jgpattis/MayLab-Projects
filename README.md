@@ -2,12 +2,6 @@ This repository contains scripts I've developed during my PhD in the May Lab at 
 
 for more information see the publications associated with these projects
 
-Lassa-Nter-NP
-
-    Influence of RNA Binding on the Structure and Dynamics of the Lassa Virus
-    JG Pattis and ER May
-    Biophysical Journal 110 (6), 1246-1254
-
 Lassa-full-NP-msm
 
 FHV-gamma-peptide
