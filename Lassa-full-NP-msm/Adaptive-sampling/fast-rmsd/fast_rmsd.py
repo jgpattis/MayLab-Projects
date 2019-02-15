@@ -1,7 +1,7 @@
 ## FAST script
 
 from msmbuilder.io import gather_metadata, save_meta, NumberedRunsParser, load_meta, itertrajs, save_generic, backup, save_trajs
-from msmbuilder.cluster import MiniBatchKMedoids
+from msmbuilder.cluster import KCenters
 
 import pickle
 import mdtraj as md
@@ -29,7 +29,7 @@ meta = gather_metadata("/scratch/jap12009/msm/fast/try1/trj/trj-*.xtc", parser)
 save_meta(meta)
 
 ## Set up parameters for clustering
-kmed = MiniBatchKMedoids(
+kcen = KCenters(
     n_clusters=num_clusters,
     metric='rmsd',
 )
@@ -37,20 +37,20 @@ kmed = MiniBatchKMedoids(
 ## Try to limit RAM usage
 def guestimate_stride():
     total_data = meta['nframes'].sum()
-    want = kmed.n_clusters * 20
+    want = kcen.n_clusters * 20
     stride = max(1, total_data // want)
     print("Since we have", total_data, "frames, we're going to stride by",
           stride, "during fitting, because this is probably adequate for",
-          kmed.n_clusters, "clusters")
+          kcen.n_clusters, "clusters")
     return stride
 
 
 ## Fit
-kmed.fit([traj for _, traj in itertrajs(meta, stride=guestimate_stride())])
-print(kmed.summarize())
+kcen.fit([traj for _, traj in itertrajs(meta, stride=guestimate_stride())])
+print(kcen.summarize())
 
 ## Save
-save_generic(kmed, 'clusterer' + str(round_num) +'.pickl')
+save_generic(kcen, 'clusterer' + str(round_num) +'.pickl')
 
 
 ## Save centroids
@@ -60,7 +60,7 @@ def frame(traj_i, frame_i):
     return md.load_frame(row['traj_fn'], frame_i, top=row['top_fn'])
 
 
-centroids = md.join((frame(ti, fi) for ti, fi in kmed.cluster_ids_),
+centroids = md.join((frame(ti, fi) for ti, fi in kcen.cluster_ids_),
                     check_topology=False)
 
 centroids_fn = 'centroids_' + str(round_num) + '.xtc'
@@ -68,7 +68,7 @@ backup(centroids_fn)
 centroids.save("centroids_" + str(round_num) + ".xtc")
 
 ## Count based function ## Find counts then normalize
-label_list = np.concatenate(kmed.labels_)
+label_list = np.concatenate(kcen.labels_)
 
 cluster_counts = [0] * num_clusters
 for i in label_list:
@@ -109,7 +109,7 @@ sorted_score = sorted(score, key=lambda x: x[1], reverse=True)
 spawn1 = np.zeros((spawn,2))
 for i in range(spawn):
     j = int(sorted_score[i][0])
-    spawn1[i] = kmed.cluster_ids_[j]
+    spawn1[i] = kcen.cluster_ids_[j]
 
 spawn2 = np.copy(spawn1)
 for i in range(spawn):
@@ -118,7 +118,7 @@ for i in range(spawn):
 full = np.zeros((num_clusters,7))
 for i in range(num_clusters):
     j = int(sorted_score[i][0])
-    full[i][0:2] = kmed.cluster_ids_[j]
+    full[i][0:2] = kcen.cluster_ids_[j]
     full[i][2] = sorted_score[i][1]
     full[i][3] = rms[j]
     full[i][4] = norm_rms[j]
