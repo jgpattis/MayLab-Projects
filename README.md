@@ -4,6 +4,10 @@ for more information see the publications associated with these projects
 
 Lassa-full-NP-msm
 
+    Markov state model of Lassa virus nucleoprotein reveals large structural changes during the trimer to monomer transition
+    JG Pattis, ER May
+    Structure 28 (5), 548-554. e3
+
 FHV-gamma-peptide
 
     Folding a viral peptide in different membrane environments: pathway and sampling analysis
